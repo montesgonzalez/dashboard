@@ -18,7 +18,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mercadona.flota.tech', config('SERVER', default='127.0.0.1')]
 
 # Application definition
 
@@ -71,8 +71,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd37fpq56fadop3',
+        'USER': 'kbbgglnmrcuhus',
+        'PASSWORD': 'a9ada067fc665ceb4d3ecb73d41e6fb1c744b2f5eae11409158810c85ef09852',
+        'HOST': 'ec2-54-73-22-169.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432',
     }
 }
 

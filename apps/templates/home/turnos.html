@@ -1,0 +1,24 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <h2>Turnos</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Conductor</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for turno in turnos %}
+            <tr>
+                <td>{{ turno.conductor.nombre }}</td>
+                <td>{{ turno.inicio }}</td>
+                <td>{{ turno.fin }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

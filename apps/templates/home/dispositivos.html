@@ -1,0 +1,28 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <h2>Dispositivos</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>IMEI</th>
+                <th>Vehículo Asociado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dispositivo in dispositivos %}
+            <tr>
+                <td>{{ dispositivo.imei }}</td>
+                <td>
+                    {% if dispositivo.vehiculo %}
+                        {{ dispositivo.vehiculo.matricula }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

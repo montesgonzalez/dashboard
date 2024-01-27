@@ -1,0 +1,129 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Viajes de Vehículos{% endblock %}
+
+{% block content %}
+<html>
+<head>
+    <title>Viajes de Vehículos</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        #mapid { height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div id="mapid" class="mb-4"></div>
+        <div class="card border-0 shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-centered table-nowrap mb-0 rounded">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="border-0 rounded-start">ID</th>
+                                <th class="border-0">Inicio</th>
+                                <th class="border-0">Fin</th>
+                                <th class="border-0">Distancia Recorrida</th>
+                                <th class="border-0">Eventos Reales</th>
+                                <th class="border-0">Puntuación Ecológica</th>
+                                <th class="border-0 rounded-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for route in routes %}
+                            <tr>
+                                <td>{{ route.id }}</td>
+                                <td>{{ route.start_timestamp }}</td>
+                                <td>{{ route.end_timestamp }}</td>
+                                <td>{{ route.distancia_recorrida }}</td>
+                                <td>{{ route.eventos_reales }}</td>
+                                <td>{{ route.puntuacion_ecologica }}</td>
+                                <td><button class="btn btn-primary btn-sm view-map" data-geojson='{{ route.geojson_data | safe }}'>Ver en Mapa</button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        (function() {
+            var map = L.map('mapid').setView([40.416775, -3.703790], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            var currentRoute;
+
+            // Función para dibujar la ruta en el mapa
+          function drawRoute(geojsonData) {
+    if (currentRoute) {
+        map.removeLayer(currentRoute);
+    }
+
+    try {
+        currentRoute = L.geoJSON(geojsonData, {
+            style: function(feature) {
+                switch (feature.properties.event_type) {
+                    case 'route': return { color: "blue", weight: 5 };
+                    case 'harsh_acceleration': return { color: "green", weight: 5 };
+                    case 'harsh_braking': return { color: "red", weight: 5 };
+                    case 'harsh_cornering': return { color: "orange", weight: 5 };
+                    default: return { color: "grey", weight: 5 };
+                }
+            },
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 5,
+                    fillColor: feature.properties.event_type === 'harsh_acceleration' ? "green" :
+                               feature.properties.event_type === 'harsh_braking' ? "red" :
+                               feature.properties.event_type === 'harsh_cornering' ? "orange" :
+                               "grey",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.event_type) {
+                    layer.bindPopup('Tipo de Evento: ' + feature.properties.event_type);
+                }
+            }
+        }).addTo(map);
+        map.fitBounds(currentRoute.getBounds());
+    } catch (error) {
+        console.error('Error al dibujar la ruta:', error);
+    }
+}
+
+
+            // Añadir evento click a cada botón de "Ver en Mapa"
+            document.querySelectorAll('.view-map').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var geojsonData = JSON.parse(this.getAttribute('data-geojson'));
+                    drawRoute(geojsonData);
+                });
+            });
+
+            // Dibujar la primera ruta al cargar la página
+        {% if routes %}
+    var geojsonData = '{{ routes.first.geojson_data | safe }}';
+    drawRoute(JSON.parse(geojsonData));
+{% endif %}
+    })();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}

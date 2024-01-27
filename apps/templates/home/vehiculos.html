@@ -1,0 +1,28 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <h2>Vehículos</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Matrícula</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Año</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vehiculo in vehiculos %}
+            <tr>
+                <td>{{ vehiculo.matricula }}</td>
+                <td>{{ vehiculo.modelo }}</td>
+                <td>{{ vehiculo.marca }}</td>
+                <td>{{ vehiculo.año }}</td>
+                <td>{{ vehiculo.estado }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

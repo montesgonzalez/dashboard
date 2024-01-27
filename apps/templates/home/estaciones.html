@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <h2>Estaciones</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Ubicación</th>
+                <th>Capacidad</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estacion in estaciones %}
+            <tr>
+                <td>{{ estacion.nombre }}</td>
+                <td>{{ estacion.ubicacion }}</td>
+                <td>{{ estacion.capacidad }}</td>
+                <td>{{ estacion.tipo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
