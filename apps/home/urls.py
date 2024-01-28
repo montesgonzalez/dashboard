@@ -12,8 +12,15 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
 
     # Secciones específicas
-    path('estaciones/', views.estaciones_view, name='estaciones'),
-    path('vehiculos/', views.vehiculos_view, name='vehiculos'),
+    #Estaciones
+    path('estaciones/', views.estaciones_view, name='estaciones_view'),
+    path('estaciones/crear/', views.crear_estacion, name='crear_estacion'),
+    path('estaciones/editar/<int:estacion_id>/', views.editar_estacion, name='editar_estacion'),
+    #Vehiculos
+    path('vehiculos/', views.vehiculos_view, name='vehiculos_view'),
+    path('vehiculos/crear/', views.crear_vehiculo, name='crear_vehiculo'),
+    path('vehiculos/editar/<int:vehiculo_id>/', views.editar_vehiculo, name='editar_vehiculo'),
+    #Conductores
     path('conductores/', views.conductores_view, name='conductores'),
     path('viajes/', views.viajes_view, name='viajes'),
     path('turnos/', views.turnos_view, name='turnos'),

@@ -78,6 +78,9 @@ class EcoScore(models.Model):
     harsh_brakings = models.IntegerField()
     harsh_cornerings = models.IntegerField()
     geojson_data = models.JSONField()
+    viaje = models.ForeignKey('Viaje', on_delete=models.SET_NULL, null=True, blank=True)  # Relación con Viaje
 
     class Meta:
         db_table = 'eco_scores'
+
+

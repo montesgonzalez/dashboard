@@ -24,6 +24,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th class="border-0 rounded-start">ID</th>
+                                <th class="border-0">Conductor</th>
                                 <th class="border-0">Inicio</th>
                                 <th class="border-0">Fin</th>
                                 <th class="border-0">Distancia Recorrida</th>
@@ -36,6 +37,7 @@
                             {% for route in routes %}
                             <tr>
                                 <td>{{ route.id }}</td>
+                                <td>{{ route.conductor_nombre|default:"Conductor no asignado" }}</td>
                                 <td>{{ route.start_timestamp }}</td>
                                 <td>{{ route.end_timestamp }}</td>
                                 <td>{{ route.distancia_recorrida }}</td>

@@ -1,15 +1,16 @@
 {% extends "layouts/base.html" %}
 {% block content %}
-<div class="container mt-3">
+<div class="container">
     <h2>Vehículos</h2>
-    <table class="table table-striped">
+    <a href="{% url 'crear_vehiculo' %}" class="btn btn-primary">Crear Nuevo Vehículo</a>
+    <table class="table">
         <thead>
             <tr>
                 <th>Matrícula</th>
                 <th>Modelo</th>
                 <th>Marca</th>
-                <th>Año</th>
-                <th>Estado</th>
+                <!-- Agrega más columnas según sea necesario -->
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -18,8 +19,10 @@
                 <td>{{ vehiculo.matricula }}</td>
                 <td>{{ vehiculo.modelo }}</td>
                 <td>{{ vehiculo.marca }}</td>
-                <td>{{ vehiculo.año }}</td>
-                <td>{{ vehiculo.estado }}</td>
+                <!-- Agrega más celdas según sea necesario -->
+                <td>
+                    <a href="{% url 'editar_vehiculo' vehiculo.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
