@@ -2,7 +2,7 @@
 
 {% block title %} {% endblock %}
 
-<!-- Specific Page CSS goes HERE  -->
+<!-- CSS específico de la página va AQUÍ  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
@@ -17,9 +17,9 @@
 
                                 {% csrf_token %}
 
-                                <!-- Form -->
+                                <!-- Formulario -->
                                 <div class="form-group mb-4">
-                                    <label for="email">Username</label>
+                                    <label for="email">Usuario</label>
                                     <div class="input-group">
                                         <span class="input-group-text" id="basic-addon1">
                                             <span class="fas fa-user-circle"></span>
@@ -27,11 +27,11 @@
                                         {{ form.username }}
                                     </div>
                                 </div>
-                                <!-- End of Form -->
+                                <!-- Fin del Formulario -->
                                 <div class="form-group">
-                                    <!-- Form -->
+                                    <!-- Formulario -->
                                     <div class="form-group mb-4">
-                                        <label for="password">Your Password</label>
+                                        <label for="password">Contraseña</label>
                                         <div class="input-group">
                                             <span class="input-group-text" id="basic-addon2">
                                                 <span class="fas fa-unlock-alt"></span>
@@ -39,24 +39,24 @@
                                             {{ form.password }}
                                         </div>
                                     </div>
-                                    <!-- End of Form -->
+                                    <!-- Fin del Formulario -->
                                     <div class="d-flex justify-content-between align-items-top mb-4">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="remember">
                                             <label class="form-check-label mb-0" for="remember">
-                                              Remember me
+                                              Recordarme
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" name="login" class="btn btn-gray-800">Sign IN</button>
+                                    <button type="submit" name="login" class="btn btn-gray-800">Iniciar Sesión</button>
                                 </div>
                             </form>
                             <div class="d-flex justify-content-center align-items-center mt-4">
                                 <span class="fw-normal">
-                                    Not registered?
-                                    <a href="{% url 'register' %}" class="fw-bold">Create account</a>
+                                    ¿No estás registrado?
+                                    <a href="{% url 'register' %}" class="fw-bold">Crear cuenta</a>
                                 </span>
                             </div>
                         </div>
@@ -68,5 +68,5 @@
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
+<!-- JS específico de la página va AQUÍ  -->
 {% block javascripts %}{% endblock javascripts %}
