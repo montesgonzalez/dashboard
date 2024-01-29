@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import EstacionForm, VehiculoForm
-from .models import Estacion, Vehiculo, Conductor, Viaje, Turno, Dispositivo, EcoScore
+from .models import Estacion, Vehiculo, Conductor, Turno, Dispositivo,Viajes
 import json
 
 
@@ -87,49 +87,95 @@ def conductores_view(request):
 
 def get_vehicle_routes():
     # Obtener detalles de eco_scores
-    eco_scores = EcoScore.objects.values('id', 'start_timestamp', 'end_timestamp', 'distancia_recorrida', 'eventos_reales', 'puntuacion_ecologica', 'harsh_accelerations', 'harsh_brakings', 'harsh_cornerings', 'geojson_data')
+    eco_scores = Viajes.objects.values('id', 'start_timestamp', 'end_timestamp', 'distancia_recorrida', 'eventos_reales', 'puntuacion_ecologica', 'harsh_accelerations', 'harsh_brakings', 'harsh_cornerings', 'geojson_data')
     for score in eco_scores:
         score['geojson_data'] = json.dumps(score['geojson_data'])
     return list(eco_scores)
 
+
 @login_required(login_url="/login/")
 def viajes_view(request):
-    # Obtener todos los registros de EcoScore
-    eco_scores = EcoScore.objects.all()
+    viajes = Viajes.objects.all()
 
-    viajes_info = []
-    for score in eco_scores:
-        # Encuentra el dispositivo correspondiente al IMEI
-        dispositivo = Dispositivo.objects.filter(imei=score.device_imei).first()
-
-        # Encuentra el vehículo asociado al dispositivo
+    viajes_data = []
+    for viaje in viajes:
+        dispositivo = Dispositivo.objects.filter(imei=viaje.imei).first() if viaje.imei else None
         vehiculo = dispositivo.vehiculo if dispositivo else None
+        conductor = Conductor.objects.filter(vehiculo=vehiculo).first() if vehiculo else None
 
-        # Buscar el viaje asociado con este vehículo
-        viaje = Viaje.objects.filter(vehiculo=vehiculo).first() if vehiculo else None
-
-        # Asigna el nombre del conductor si hay un viaje asociado
-        conductor_nombre = viaje.conductor.nombre if viaje and viaje.conductor else 'Conductor no asignado'
-
-        # Prepara los datos del viaje
         viaje_data = {
-            'id': score.id,
-            'conductor_nombre': conductor_nombre,
-            'start_timestamp': score.start_timestamp,
-            'end_timestamp': score.end_timestamp,
-            'distancia_recorrida': score.distancia_recorrida,
-            'eventos_reales': score.eventos_reales,
-            'puntuacion_ecologica': score.puntuacion_ecologica,
-            'harsh_accelerations': score.harsh_accelerations,
-            'harsh_brakings': score.harsh_brakings,
-            'harsh_cornerings': score.harsh_cornerings,
-            'geojson_data': json.dumps(score.geojson_data)
+            'id': viaje.id,
+            'conductor_nombre': conductor.nombre if conductor else 'Conductor no asignado',
+            'vehiculo': vehiculo.matricula if vehiculo else 'Vehículo no asignado',
+            'dispositivo': dispositivo.imei if dispositivo else 'Dispositivo no asignado',
+            'estacion': vehiculo.estacion.nombre if vehiculo and vehiculo.estacion else 'Estación no asignada',
+            'start_timestamp': viaje.start_timestamp,
+            'end_timestamp': viaje.end_timestamp,
+            'distancia_recorrida': viaje.distancia_recorrida,
+            'eventos_reales': viaje.eventos_reales,
+            'puntuacion_ecologica': viaje.puntuacion_ecologica,
         }
+        viajes_data.append(viaje_data)
 
-        viajes_info.append(viaje_data)
+    return render(request, 'home/lista_viajes.html', {'viajes': viajes_data})
+from django.core.exceptions import ObjectDoesNotExist
 
-    return render(request, 'home/viajes.html', {'routes': viajes_info})
 
+@login_required(login_url="/login/")
+def lista_viajes_view(request):
+    viajes = Viajes.objects.all()
+
+    viajes_data = []
+    for viaje in viajes:
+        dispositivo = Dispositivo.objects.filter(imei=viaje.imei).first() if viaje.imei else None
+        vehiculo = dispositivo.vehiculo if dispositivo else None
+        conductor = Conductor.objects.filter(vehiculo=vehiculo).first() if vehiculo else None
+
+        viaje_data = {
+            'id': viaje.id,
+            'conductor_nombre': conductor.nombre if conductor else 'Conductor no asignado',
+            'vehiculo': vehiculo.matricula if vehiculo else 'Vehículo no asignado',
+            'dispositivo': dispositivo.imei if dispositivo else 'Dispositivo no asignado',
+            'estacion': vehiculo.estacion.nombre if vehiculo and vehiculo.estacion else 'Estación no asignada',
+            'start_timestamp': viaje.start_timestamp,
+            'end_timestamp': viaje.end_timestamp,
+            'distancia_recorrida': viaje.distancia_recorrida,
+            'eventos_reales': viaje.eventos_reales,
+            'puntuacion_ecologica': viaje.puntuacion_ecologica,
+        }
+        viajes_data.append(viaje_data)
+
+    return render(request, 'home/lista_viajes.html', {'viajes': viajes_data})
+@login_required(login_url="/login/")
+def viaje_detalle_view(request, viaje_id):
+    viaje = Viajes.objects.get(id=viaje_id)
+    dispositivo = Dispositivo.objects.filter(imei=viaje.imei).first() if viaje.imei else None
+    vehiculo = dispositivo.vehiculo if dispositivo else None
+
+    try:
+        conductor = Conductor.objects.get(vehiculo=vehiculo)
+        conductor_nombre = conductor.nombre
+    except Conductor.DoesNotExist:
+        conductor_nombre = 'Conductor no asignado'
+
+    viaje_data = {
+        'id': viaje.id,
+        'conductor_nombre': conductor_nombre,
+        'vehiculo': vehiculo.matricula if vehiculo else 'Vehículo no asignado',
+        'dispositivo': dispositivo.imei if dispositivo else 'Dispositivo no asignado',
+        'imei': viaje.imei,
+        'start_timestamp': viaje.start_timestamp,
+        'end_timestamp': viaje.end_timestamp,
+        'distancia_recorrida': viaje.distancia_recorrida,
+        'eventos_reales': viaje.eventos_reales,
+        'puntuacion_ecologica': viaje.puntuacion_ecologica,
+        'harsh_accelerations': viaje.harsh_accelerations,
+        'harsh_brakings': viaje.harsh_brakings,
+        'harsh_cornerings': viaje.harsh_cornerings,
+        'geojson_data': json.dumps(viaje.geojson_data)
+    }
+
+    return render(request, 'home/detalle_viaje.html', {'viaje': viaje_data})
 @login_required(login_url="/login/")
 def turnos_view(request):
     turnos = Turno.objects.all()

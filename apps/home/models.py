@@ -3,6 +3,11 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+# -*- encoding: utf-8 -*-
+"""
+Copyright (c) 2019 - present AppSeed.us
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -29,6 +34,8 @@ class Vehiculo(models.Model):
 
     def __str__(self):
         return self.matricula
+
+
 class Conductor(models.Model):
     nombre = models.CharField(max_length=100)
     dni = models.CharField(max_length=50)
@@ -39,15 +46,7 @@ class Conductor(models.Model):
 
     def __str__(self):
         return self.nombre
-class Viaje(models.Model):
-    ruta = models.TextField()
-    duracion = models.DurationField()
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
-    conductor = models.ForeignKey(Conductor, on_delete=models.CASCADE)
-    # Campos adicionales para puntuaciones ecológicas y comportamiento de conducción
 
-    def __str__(self):
-        return f"{self.vehiculo.matricula} - {self.conductor.nombre}"
 
 class Turno(models.Model):
     conductor = models.ForeignKey(Conductor, on_delete=models.CASCADE)
@@ -58,6 +57,7 @@ class Turno(models.Model):
     def __str__(self):
         return f"{self.inicio} - {self.fin} | {self.conductor.nombre}"
 
+
 class Dispositivo(models.Model):
     imei = models.CharField(max_length=50)
     vehiculo = models.OneToOneField(Vehiculo, on_delete=models.CASCADE, null=True, blank=True, related_name='dispositivo_asociado')
@@ -65,22 +65,21 @@ class Dispositivo(models.Model):
     def __str__(self):
         return self.imei
 
-class EcoScore(models.Model):
-    id = models.AutoField(primary_key=True)
-    device_imei = models.CharField(max_length=15)
-    start_timestamp = models.DateTimeField()
-    end_timestamp = models.DateTimeField()
-    distancia_recorrida = models.FloatField()
-    eventos_permitidos_por_km = models.FloatField()
-    eventos_reales = models.IntegerField()
-    puntuacion_ecologica = models.FloatField()
-    harsh_accelerations = models.IntegerField()
-    harsh_brakings = models.IntegerField()
-    harsh_cornerings = models.IntegerField()
-    geojson_data = models.JSONField()
-    viaje = models.ForeignKey('Viaje', on_delete=models.SET_NULL, null=True, blank=True)  # Relación con Viaje
+
+class Viajes(models.Model):
+    imei = models.CharField(max_length=15, null=True, blank=True)  # Nuevo campo para IMEI
+    start_timestamp = models.DateTimeField(blank=True, null=True)
+    end_timestamp = models.DateTimeField(blank=True, null=True)
+    distancia_recorrida = models.FloatField(blank=True, null=True)
+    eventos_permitidos_por_km = models.FloatField(blank=True, null=True)
+    eventos_reales = models.IntegerField(blank=True, null=True)
+    puntuacion_ecologica = models.FloatField(blank=True, null=True)
+    harsh_accelerations = models.IntegerField(blank=True, null=True)
+    harsh_brakings = models.IntegerField(blank=True, null=True)
+    harsh_cornerings = models.IntegerField(blank=True, null=True)
+    geojson_data = models.JSONField(blank=True, null=True)
 
     class Meta:
-        db_table = 'eco_scores'
+        db_table = 'viajes'
 
 

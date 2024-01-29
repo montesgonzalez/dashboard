@@ -21,10 +21,12 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead class="thead-light">
+                       <thead class="thead-light">
                             <tr>
                                 <th class="border-0 rounded-start">ID</th>
                                 <th class="border-0">Conductor</th>
+                                <th class="border-0">Vehículo</th>
+                                <th class="border-0">Dispositivo</th>
                                 <th class="border-0">Inicio</th>
                                 <th class="border-0">Fin</th>
                                 <th class="border-0">Distancia Recorrida</th>
@@ -38,6 +40,8 @@
                             <tr>
                                 <td>{{ route.id }}</td>
                                 <td>{{ route.conductor_nombre|default:"Conductor no asignado" }}</td>
+                                <td>{{ route.vehiculo|default:"Vehículo no asignado" }}</td>
+                                <td>{{ route.dispositivo|default:"Dispositivo no asignado" }}</td>
                                 <td>{{ route.start_timestamp }}</td>
                                 <td>{{ route.end_timestamp }}</td>
                                 <td>{{ route.distancia_recorrida }}</td>
