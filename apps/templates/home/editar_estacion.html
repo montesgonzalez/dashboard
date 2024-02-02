@@ -1,11 +1,13 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 <div class="container">
-    <h2>Editar Vehículo</h2>
+    <h2 class="mb-4">Editar Vehículo</h2>
     <form method="post" class="form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <div class="mb-3">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-success">Actualizar</button>
     </form>
 </div>
 {% endblock %}

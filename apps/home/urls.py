@@ -20,6 +20,8 @@ urlpatterns = [
     path('vehiculos/', views.vehiculos_view, name='vehiculos_view'),
     path('vehiculos/crear/', views.crear_vehiculo, name='crear_vehiculo'),
     path('vehiculos/editar/<int:vehiculo_id>/', views.editar_vehiculo, name='editar_vehiculo'),
+
+
     #Conductores
     path('conductores/', views.conductores_view, name='conductores'),
 

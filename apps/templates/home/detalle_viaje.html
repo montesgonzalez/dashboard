@@ -29,11 +29,20 @@
         <li class="list-group-item">Conductor: {{ viaje.conductor_nombre|default:"Conductor no asignado" }}</li>
         <li class="list-group-item">Vehículo: {{ viaje.vehiculo|default:"Vehículo no asignado" }}</li>
         <li class="list-group-item">Dispositivo: {{ viaje.dispositivo|default:"Dispositivo no asignado" }}</li>
-        <li class="list-group-item">Inicio: {{ viaje.start_timestamp }}</li>
-        <li class="list-group-item">Fin: {{ viaje.end_timestamp }}</li>
-        <li class="list-group-item">Distancia Recorrida: {{ viaje.distancia_recorrida }}</li>
-        <li class="list-group-item">Eventos Reales: {{ viaje.eventos_reales }}</li>
-        <li class="list-group-item">Puntuación Ecológica: {{ viaje.puntuacion_ecologica }}</li>
+        <li class="list-group-item">Inicio: {{ viaje.start_timestamp|date:"d/m/Y H:i:s" }}</li>
+        <li class="list-group-item">Fin: {{ viaje.end_timestamp|date:"d/m/Y H:i:s" }}</li>
+        <li class="list-group-item">Distancia Recorrida: {{ viaje.distancia_recorrida }} km</li>
+        <li class="list-group-item">Eventos: {{ viaje.eventos_reales }}</li>
+        <li class="list-group-item">
+    Puntuación: 
+    {% if viaje.puntuacion_ecologica < 5 %}
+    <span style="color: red;">{{ viaje.puntuacion_ecologica }}</span>
+    {% elif viaje.puntuacion_ecologica < 7 %}
+    <span style="color: orange;">{{ viaje.puntuacion_ecologica }}</span>
+    {% else %}
+    <span style="color: green;">{{ viaje.puntuacion_ecologica }}</span>
+    {% endif %}
+</li>
     </ul>
 </div>
  </div>       

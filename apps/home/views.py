@@ -109,16 +109,15 @@ def viajes_view(request):
             'vehiculo': vehiculo.matricula if vehiculo else 'Vehículo no asignado',
             'dispositivo': dispositivo.imei if dispositivo else 'Dispositivo no asignado',
             'estacion': vehiculo.estacion.nombre if vehiculo and vehiculo.estacion else 'Estación no asignada',
-            'start_timestamp': viaje.start_timestamp,
-            'end_timestamp': viaje.end_timestamp,
-            'distancia_recorrida': viaje.distancia_recorrida,
+            'start_timestamp': viaje.start_timestamp.strftime('%Y-%m-%d %H:%M:%S') if viaje.start_timestamp else None,
+            'end_timestamp': viaje.end_timestamp.strftime('%Y-%m-%d %H:%M:%S') if viaje.end_timestamp else None,
+            'distancia_recorrida': "{:.2f}".format(viaje.distancia_recorrida) if viaje.distancia_recorrida else None,
             'eventos_reales': viaje.eventos_reales,
-            'puntuacion_ecologica': viaje.puntuacion_ecologica,
+            'puntuacion_ecologica': "{:.2f}".format(viaje.puntuacion_ecologica) if viaje.puntuacion_ecologica else None,
         }
         viajes_data.append(viaje_data)
 
     return render(request, 'home/lista_viajes.html', {'viajes': viajes_data})
-from django.core.exceptions import ObjectDoesNotExist
 
 
 @login_required(login_url="/login/")

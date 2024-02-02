@@ -1,11 +1,31 @@
 {% extends 'layouts/base.html' %}
 {% block content %}
 <div class="container">
-    <h2>Crear Vehículo</h2>
+    <h2 class="mb-4">Crear Vehículo</h2>
     <form method="post" class="form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {% if field.field.widget.input_type == 'text' %}
+            <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{ field.id_for_label }}" placeholder="{{ field.label }}">
+            {% elif field.field.widget.input_type == 'textarea' %}
+            <textarea class="form-control" id="{{ field.id_for_label }}" rows="3"></textarea>
+            {% elif field.field.widget.input_type == 'select' %}
+            <select class="form-control" id="{{ field.id_for_label }}">
+                {% for choice in field.field.choices %}
+                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            {% elif field.label == 'Año' %}
+            <input type="number" class="form-control" id="{{ field.id_for_label }}" placeholder="{{ field.label }}">
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Guardar</button>
     </form>
 </div>
 {% endblock %}
