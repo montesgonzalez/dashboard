@@ -4,8 +4,9 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from django.urls import path, re_path
-from apps.home import views
-from .views import viajes_view, viaje_detalle_view
+from . import views
+from .views import viaje_detalle_view, viajes_view
+
 urlpatterns = [
     # La página de inicio
     path('', views.index, name='home'),
@@ -26,11 +27,13 @@ urlpatterns = [
     #Viajes
     path('viajes/', viajes_view, name='lista_viajes'),
     path('viajes/<int:viaje_id>/', viaje_detalle_view, name='detalle_viaje'),
-
     path('turnos/', views.turnos_view, name='turnos'),
-    path('dispositivos/', views.dispositivos_view, name='dispositivos'),
 
-    # Coincide con cualquier archivo html
+    # Dispositivos
+    path('dispositivos/', views.lista_dispositivos_view, name='lista-dispositivos'),
+    path('tracking/<str:imei>/', views.tracking_view, name='tracking'),
+
+    # Captura todas las demás páginas HTML
     re_path(r'^.*\.*', views.pages, name='pages'),
 ]
 

@@ -1,0 +1,28 @@
+<!-- home/dispositivo_sse.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dispositivo SSE</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Dispositivo: {{ dispositivo.imei }}</h1>
+    <div id="sse-data">
+        Esperando datos...
+    </div>
+
+    <script>
+        var source = new EventSource('/dispositivo-sse/{{ dispositivo.imei }}/');
+
+        source.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            $('#sse-data').html(JSON.stringify(data, null, 2));
+        };
+
+        source.onerror = function(event) {
+            console.error('Error en SSE', event);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Dispositivos</h1>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Lista de Dispositivos</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">IMEI</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dispositivo in dispositivos %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ dispositivo.imei }}</td>
+                        <td>
+                            <a href="{% url 'tracking' dispositivo.imei %}" class="btn btn-primary btn-sm">Ver Tracking</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

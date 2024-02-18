@@ -1,0 +1,43 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header border-0">
+                    <h3 class="mb-0">Lista de Dispositivos</h3>
+                </div>
+                <!-- Lista de dispositivos -->
+                <div class="table-responsive py-4">
+                    <table class="table table-flush" id="datatable">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>IMEI</th>
+                                <th>Vehículo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dispositivo in dispositivos %}
+                            <tr>
+                                <td>{{ dispositivo.imei }}</td>
+                                <td>{{ dispositivo.vehiculo.matricula if dispositivo.vehiculo else 'No asignado' }}</td>
+                                <td>
+                                    <a href="{% url 'detalle_dispositivo' dispositivo.id %}" class="btn btn-sm btn-primary">Ver detalles</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No hay dispositivos disponibles.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

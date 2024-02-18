@@ -1,0 +1,17 @@
+<!-- templates/dispositivo_sse_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Introducir IMEI</title>
+</head>
+<body>
+    <h1>Introducir IMEI del Dispositivo</h1>
+    <form action="{% url 'dispositivo-sse' %}" method="get">
+        <label for="imei">IMEI:</label>
+        <input type="text" id="imei" name="imei" required>
+        <input type="submit" value="Ver Ubicación">
+    </form>
+</body>
+</html>

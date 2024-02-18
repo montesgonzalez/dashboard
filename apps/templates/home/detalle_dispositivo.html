@@ -1,0 +1,39 @@
+<!-- templates/home/detalle_dispositivo.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Dispositivo</title>
+    <!-- Agrega aquí tus enlaces a CSS o JavaScript, si los tienes -->
+</head>
+<body>
+    <h1>Detalle del Dispositivo: {{ dispositivo.nombre }}</h1>
+    <div id="dispositivoInfo">Cargando datos...</div>
+
+    <script>
+        var eventSourceUrl = "/location-stream/" + "{{ dispositivo.imei }}";
+        var eventSource = new EventSource(eventSourceUrl);
+        
+        eventSource.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            document.getElementById("dispositivoInfo").innerHTML = JSON.stringify(data, null, 2);
+        };
+
+        eventSource.onerror = function(error) {
+            console.error("Error en la conexión SSE: ", error);
+
+            if (error.currentTarget && error.currentTarget.readyState === EventSource.CLOSED) {
+                console.error("La conexión SSE se ha cerrado. URL: " + eventSourceUrl);
+            } else if (error.currentTarget && error.currentTarget.readyState === EventSource.CONNECTING) {
+                console.error("Reconectando a SSE. URL: " + eventSourceUrl);
+            } else {
+                console.error("Error desconocido en SSE. URL: " + eventSourceUrl);
+            }
+
+            document.getElementById("dispositivoInfo").textContent = "Error al cargar los datos.";
+        };
+    </script>
+</body>
+</html>
+

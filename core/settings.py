@@ -7,6 +7,21 @@ import os
 from decouple import config
 from unipath import Path
 
+# settings.py
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
+CHANNEL_LOCATIONS = 'ubicaciones'
+
+# settings.py
+
+PUSHER_APP_ID = '1758089'
+PUSHER_KEY = 'a939fb0532ef16820cda'
+PUSHER_SECRET = '9fedcc874b91961682e2'
+PUSHER_CLUSTER = 'mt1'
+
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,7 +33,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'mercadona.flota.tech', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', 'mercadona.flota.tech', config('SERVER', default='127.0.0.1')]
 
 # Application definition
 
@@ -29,8 +44,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.home'  # Enable the inner home (home)
+    'apps.home',
+     'channels'
 ]
+
+ASGI_APPLICATION = 'core.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,14 +97,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+import os
+from decouple import config
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd37fpq56fadop3',
-        'USER': 'kbbgglnmrcuhus',
-        'PASSWORD': 'a9ada067fc665ceb4d3ecb73d41e6fb1c744b2f5eae11409158810c85ef09852',
-        'HOST': 'ec2-54-73-22-169.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

@@ -1,0 +1,28 @@
+<!-- templates/dispositivo_sse.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ubicación en Tiempo Real</title>
+</head>
+<body>
+    <h1>Ubicación en Tiempo Real del Dispositivo</h1>
+    <div id="ubicacion-data">Esperando datos...</div>
+
+    <script>
+        var eventSource = new EventSource("{% url 'dispositivo-sse' imei=imei %}");
+        
+        eventSource.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            document.getElementById("ubicacion-data").innerText = 
+                "Latitud: " + data.latitude + ", Longitud: " + data.longitude;
+        };
+
+        eventSource.onerror = function(error) {
+            console.error("Error en SSE", error);
+            document.getElementById("ubicacion-data").innerText = "Error al recibir datos.";
+        };
+    </script>
+</body>
+</html>

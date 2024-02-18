@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Detalle del Dispositivo: {{ dispositivo.imei }}</h1>
+    <!-- Indicador de conexión -->
+    <div id="connection-status" class="alert alert-warning" role="alert">Esperando datos...</div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div id="map" style="height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Inclusión de CSS y JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+<script>
+    var map;
+    var marker;
+    var connectionStatus = document.getElementById('connection-status');
+
+    function initMap() {
+        var latitude = 40.416775; // Coordenadas de Madrid, España
+        var longitude = -3.703790;
+
+        map = L.map('map').setView([latitude, longitude], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([latitude, longitude]).addTo(map);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+
+        Pusher.logToConsole = true;
+        var pusher = new Pusher('{{ pusher_key }}', {
+            cluster: '{{ pusher_cluster }}'
+        });
+
+        var channel = pusher.subscribe('{{ pusher_channel }}');
+        channel.bind('location-update', function(data) {
+            var latitude = data.data.Latitude;
+            var longitude = data.data.Longitude;
+
+            if (latitude && longitude) {
+                marker.setLatLng([latitude, longitude]).update();
+                map.panTo([latitude, longitude]);
+                connectionStatus.textContent = 'Conectado';
+                connectionStatus.classList.remove('alert-warning');
+                connectionStatus.classList.add('alert-success');
+            }
+        });
+
+        // Si se pierde la conexión con Pusher
+        pusher.connection.bind('disconnected', function() {
+            connectionStatus.textContent = 'Desconectado';
+            connectionStatus.classList.remove('alert-success');
+            connectionStatus.classList.add('alert-danger');
+        });
+    });
+</script>
+{% endblock %}
+
+
