@@ -6,13 +6,19 @@
     <!-- Indicador de conexión -->
     <div id="connection-status" class="alert alert-warning" role="alert">Esperando datos...</div>
 
+    <!-- Formulario para enviar comandos -->
+    <div class="mb-3">
+        <label for="command-input" class="form-label">Enviar Comando</label>
+        <input type="text" id="command-input" class="form-control" placeholder="Escribe el comando aquí">
+        <button class="btn btn-primary mt-2" onclick="sendCommand()">Enviar Comando</button>
+    </div>
+
     <div class="card">
         <div class="card-body p-0">
             <div id="map" style="height: 400px;"></div>
         </div>
     </div>
 </div>
-
 <!-- Inclusión de CSS y JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -34,6 +40,7 @@
 
         marker = L.marker([latitude, longitude]).addTo(map);
     }
+    
 
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
@@ -57,6 +64,13 @@
             }
         });
 
+        // Suscribirse al canal de respuesta del comando
+        var commandResponseChannel = pusher.subscribe('command-response-{{ dispositivo.imei }}');
+        commandResponseChannel.bind('new-response', function(data) {
+            console.log('Respuesta del comando recibida:', data);
+            alert('Respuesta del comando recibida: ' + JSON.stringify(data));
+        });
+
         // Si se pierde la conexión con Pusher
         pusher.connection.bind('disconnected', function() {
             connectionStatus.textContent = 'Desconectado';
@@ -64,7 +78,45 @@
             connectionStatus.classList.add('alert-danger');
         });
     });
+    
+    function sendCommand() {
+    var command = document.getElementById('command-input').value;
+    var imei = '{{ dispositivo.imei }}';
+    var url = `/send-command/${imei}/`;
+
+    // Obtiene el token CSRF desde la cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken  // Usa el token CSRF obtenido
+        },
+        body: JSON.stringify({command: command})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        alert(data.message);
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
 {% endblock %}
-
 

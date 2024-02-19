@@ -32,7 +32,7 @@ urlpatterns = [
     # Dispositivos
     path('dispositivos/', views.lista_dispositivos_view, name='lista-dispositivos'),
     path('tracking/<str:imei>/', views.tracking_view, name='tracking'),
-
+    path('send-command/<str:imei>/', views.send_command, name='send-command'),
     # Captura todas las demás páginas HTML
     re_path(r'^.*\.*', views.pages, name='pages'),
 ]

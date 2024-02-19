@@ -4,13 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import json
+import os
 import ssl
 import time
 
 from django import template
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -37,6 +38,39 @@ from django.shortcuts import render, get_object_or_404
 from .models import Dispositivo
 from django.conf import settings
 from pusher import Pusher
+from django.views.decorators.csrf import csrf_exempt
+# settings.py
+REDIS_HOST = 'us1-climbing-cowbird-40081.upstash.io'
+REDIS_PORT = 40081
+REDIS_PASSWORD = '1212460ce61a4ef6b549248b4fd9d9a0'
+REDIS_SSL = True
+
+
+### SEND COMMANDS TO REDIS
+
+@csrf_exempt
+def send_command(request, imei):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        command = data.get('command')
+
+        r = redis.Redis(
+            host=REDIS_HOST,
+            port=REDIS_PORT,
+            password=REDIS_PASSWORD,
+            ssl=REDIS_SSL,
+            ssl_cert_reqs=None  # Desactivar la verificación del certificado SSL
+        )
+
+        try:
+            command_data = {'imei': imei, 'command': command}
+            r.publish('comandos', json.dumps(command_data))
+            return JsonResponse({'status': 'success', 'message': f'Comando enviado a {imei}'})
+        except redis.exceptions.ConnectionError as e:
+            return JsonResponse({'status': 'error', 'message': f'Error al conectar con Redis: {e}'})
+
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+
 
 # Inicializar Pusher
 pusher_client = Pusher(
