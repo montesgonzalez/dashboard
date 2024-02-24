@@ -6,6 +6,13 @@
     <!-- Indicador de conexión -->
     <div id="connection-status" class="alert alert-warning" role="alert">Esperando datos...</div>
 
+    <!-- Indicadores para los nuevos datos -->
+    <div id="altitude" class="alert alert-info" role="alert"><i class="material-icons">terrain</i></div>
+    <div id="angle" class="alert alert-info" role="alert"><i class="material-icons">compass_calibration</i></div>
+    <div id="satellites" class="alert alert-info" role="alert"><i class="material-icons">satellite</i></div>
+    <div id="speed" class="alert alert-info" role="alert"><i class="material-icons">speed</i></div>
+    <div id="io-data" class="alert alert-info" role="alert"><i class="material-icons">developer_board</i></div>
+
     <!-- Formulario para enviar comandos -->
     <div class="mb-3">
         <label for="command-input" class="form-label">Enviar Comando</label>
@@ -21,12 +28,20 @@
 </div>
 <!-- Inclusión de CSS y JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script>
     var map;
     var marker;
     var connectionStatus = document.getElementById('connection-status');
+
+    // Indicadores para los nuevos datos
+    var altitudeIndicator = document.getElementById('altitude');
+    var angleIndicator = document.getElementById('angle');
+    var satellitesIndicator = document.getElementById('satellites');
+    var speedIndicator = document.getElementById('speed');
+    var ioDataIndicator = document.getElementById('io-data');
 
     function initMap() {
         var latitude = 40.416775; // Coordenadas de Madrid, España
@@ -40,30 +55,42 @@
 
         marker = L.marker([latitude, longitude]).addTo(map);
     }
-    
 
     document.addEventListener('DOMContentLoaded', function() {
-        initMap();
+    initMap();
 
-        Pusher.logToConsole = true;
-        var pusher = new Pusher('{{ pusher_key }}', {
-            cluster: '{{ pusher_cluster }}'
-        });
+    Pusher.logToConsole = true;
+    var pusher = new Pusher('{{ pusher_key }}', {
+        cluster: '{{ pusher_cluster }}'
+    });
 
-        var channel = pusher.subscribe('{{ pusher_channel }}');
-        channel.bind('location-update', function(data) {
-            var latitude = data.data.Latitude;
-            var longitude = data.data.Longitude;
+    var channel = pusher.subscribe('{{ pusher_channel }}');
+    channel.bind('location-update', function(data) {
+        var latitude = data.Latitude;
+        var longitude = data.Longitude;
+        var altitude = data.Altitude;
+        var angle = data.Angle;
+        var satellites = data.Satellites;
+        var speed = data.Speed;
+        var ioData = data['IO Data'];
 
-            if (latitude && longitude) {
-                marker.setLatLng([latitude, longitude]).update();
-                map.panTo([latitude, longitude]);
-                connectionStatus.textContent = 'Conectado';
-                connectionStatus.classList.remove('alert-warning');
-                connectionStatus.classList.add('alert-success');
-            }
-        });
+        if (latitude && longitude) {
+            marker.setLatLng([latitude, longitude]).update();
+            map.panTo([latitude, longitude]);
+            connectionStatus.textContent = 'Conectado';
+            connectionStatus.classList.remove('alert-warning');
+            connectionStatus.classList.add('alert-success');
+        }
 
+        // Actualizar los indicadores con los nuevos datos
+        altitudeIndicator.textContent = 'Altitude: ' + altitude;
+        angleIndicator.textContent = 'Angle: ' + angle;
+        satellitesIndicator.textContent = 'Satellites: ' + satellites;
+        speedIndicator.textContent = 'Speed: ' + speed;
+        ioDataIndicator.textContent = 'IO Data: ' + JSON.stringify(ioData);
+ 
+
+});
         // Suscribirse al canal de respuesta del comando
         var commandResponseChannel = pusher.subscribe('command-response-{{ dispositivo.imei }}');
         commandResponseChannel.bind('new-response', function(data) {
@@ -78,7 +105,7 @@
             connectionStatus.classList.add('alert-danger');
         });
     });
-    
+
     function sendCommand() {
     var command = document.getElementById('command-input').value;
     var imei = '{{ dispositivo.imei }}';
@@ -119,4 +146,3 @@
 }
 </script>
 {% endblock %}
-
