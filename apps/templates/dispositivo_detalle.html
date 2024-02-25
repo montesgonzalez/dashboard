@@ -65,7 +65,7 @@
     var pusher = new Pusher('{{ pusher_key }}', {
         cluster: '{{ pusher_cluster }}'
     });
-
+    //fixed bug
     var imei = '{{ dispositivo.imei }}';
     var locationChannel = pusher.subscribe('dispositivo-' + imei);
 
