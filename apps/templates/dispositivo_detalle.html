@@ -57,40 +57,46 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-    initMap();
+        initMap();
 
-    Pusher.logToConsole = true;
-    var pusher = new Pusher('{{ pusher_key }}', {
-        cluster: '{{ pusher_cluster }}'
-    });
+        // Configuración de Pusher
+        Pusher.logToConsole = true;
+        var pusher = new Pusher('{{ pusher_key }}', {
+            cluster: '{{ pusher_cluster }}'
+        });
 
-    var channel = pusher.subscribe('{{ pusher_channel }}');
-    channel.bind('location-update', function(data) {
-        var latitude = data.Latitude;
-        var longitude = data.Longitude;
-        var altitude = data.Altitude;
-        var angle = data.Angle;
-        var satellites = data.Satellites;
-        var speed = data.Speed;
-        var ioData = data['IO Data'];
+        var imei = '{{ dispositivo.imei }}';
+        var channel = pusher.subscribe('dispositivo-' + imei);
 
-        if (latitude && longitude) {
-            marker.setLatLng([latitude, longitude]).update();
-            map.panTo([latitude, longitude]);
-            connectionStatus.textContent = 'Conectado';
-            connectionStatus.classList.remove('alert-warning');
-            connectionStatus.classList.add('alert-success');
-        }
+        channel.bind('location-update', function(data) {
+            // Comprobamos la estructura de los datos y accedemos a ellos correctamente
+            if (data && data['GPS Data']) {
+                var gpsData = data['GPS Data'];
+                var ioData = data['I/O Data'];
 
-        // Actualizar los indicadores con los nuevos datos
-        altitudeIndicator.textContent = 'Altitude: ' + altitude;
-        angleIndicator.textContent = 'Angle: ' + angle;
-        satellitesIndicator.textContent = 'Satellites: ' + satellites;
-        speedIndicator.textContent = 'Speed: ' + speed;
-        ioDataIndicator.textContent = 'IO Data: ' + JSON.stringify(ioData);
- 
+                // Actualizar la posición en el mapa
+                if (gpsData.Latitude && gpsData.Longitude) {
+                    marker.setLatLng([gpsData.Latitude, gpsData.Longitude]).update();
+                    map.panTo([gpsData.Latitude, gpsData.Longitude]);
+                    connectionStatus.textContent = 'Conectado';
+                    connectionStatus.classList.remove('alert-warning');
+                    connectionStatus.classList.add('alert-success');
+                }
 
+                // Actualizar los indicadores con los nuevos datos
+                altitudeIndicator.textContent = 'Altitude: ' + gpsData.Altitude;
+                angleIndicator.textContent = 'Angle: ' + gpsData.Angle;
+                satellitesIndicator.textContent = 'Satellites: ' + gpsData.Satellites;
+                speedIndicator.textContent = 'Speed: ' + gpsData.Speed;
+                ioDataIndicator.textContent = 'IO Data: ' + JSON.stringify(ioData);
+            } else {
+                console.error('Error en la estructura de datos recibidos:', data);
+            }
+        });
+
+    // Aquí podrías agregar otros eventos de Pusher según sea necesario
 });
+
         // Suscribirse al canal de respuesta del comando
         var commandResponseChannel = pusher.subscribe('command-response-{{ dispositivo.imei }}');
         commandResponseChannel.bind('new-response', function(data) {
@@ -104,7 +110,6 @@
             connectionStatus.classList.remove('alert-success');
             connectionStatus.classList.add('alert-danger');
         });
-    });
 
     function sendCommand() {
     var command = document.getElementById('command-input').value;
